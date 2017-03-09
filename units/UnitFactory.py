@@ -7,9 +7,9 @@ from random import randint
 class UnitFactory:
     @staticmethod
     def create_unit(x, y, evol):
-        random = randint(0, 500)
+        random = randint(0, 1000)
         unit = None
-        if random > 450:
+        if random > 500:
             unit = EmptyUnit(x, y)
         else:
             unit = Unit(x, y, evol)
