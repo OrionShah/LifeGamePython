@@ -1,12 +1,10 @@
 import time
 import datetime
 import sys
-from random import randint
 
-from Unit import Unit
 from prettytable import PrettyTable
 from subprocess import call
-
+from units.UnitFactory import UnitFactory
 
 _old_excepthook = sys.excepthook
 
@@ -20,11 +18,10 @@ sys.excepthook = myexcepthook
 
 run = True
 TIMER = 0.01
+size = 10
 
 def render():
-    units = [Unit(randint(0, 4), randint(0, 4)) for i in range(10)]
-    # for unit in units:
-    #     print(unit)
+    units = [[UnitFactory.create_unit(i, j, 1) for j in range(size)] for i in range(size)]
 
     i = 1
     call(["clear"])
@@ -36,13 +33,17 @@ def render():
         print("Current iter: %d" % i)
         i += 1
 
-        table = PrettyTable(["name:", ] + [unit.get_name() for unit in units])
-        table.add_row(["size: "] + [unit.get_size() for unit in units])
-        for unit in units:
-            unit.process_iter()
+        table = PrettyTable(header=False, hrules=1)
+        for row in units:
+            table.add_row([unit.get_str() for unit in row])
+
+
+        for row in units:
+            for unit in row:
+                units[unit.x][unit.y] = unit.process_iter()
 
         print(table)
-        print("\033[9A")
+        print("\033[90A")
         time.sleep(TIMER)
 
 

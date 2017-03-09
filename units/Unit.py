@@ -1,21 +1,29 @@
 import random
-import uuid
 from colorama import Fore, Style
 
+from elizabeth import Personal
+import units
+
+# from units.UnitFactory import UnitFactory
+
 class Unit:
-    def __init__(self, x, y):
+    def __init__(self, x, y, evol):
+        person = Personal('en')
         self.size = 1
-        self.name = str(uuid.uuid4())[2:8]
+        self.name = person.name(gender='female')
         self.x = x
         self.y = y
+        self.evol = evol
 
     def process_iter(self):
-        rand = random.randint(0, 100)
-        if rand > 97:
+        rand = random.randint(0, 1000)
+        if rand > 950:
             self.size += 1
 
-        if self.size > 10:
-            self.__init__(self.x, self.y)
+        if self.size > 9:
+            return units.UnitFactory.UnitFactory.create_unit(self.x, self.y, self.evol+1)
+
+        return self
 
     def get_name(self):
         final_str = ''
@@ -31,6 +39,17 @@ class Unit:
 
     def get_size(self):
         return self.size
+
+    def get_evol(self):
+        return self.evol
+
+    def get_str(self):
+        str = "{name:10s}\n ({evol}:{size})".format(
+            name=self.get_name(),
+            evol=self.get_evol(),
+            size=self.get_size()
+        )
+        return str
 
     def __str__(self):
         return "Name: {name} Coords: {x}:{y} Size: {size}".format(
