@@ -1,7 +1,7 @@
 import random
 from colorama import Fore, Style
 
-from elizabeth import Personal
+from elizabeth import Personal, Business
 import units
 
 # from units.UnitFactory import UnitFactory
@@ -13,12 +13,12 @@ AGE_TO = 25
 class Unit:
     def __init__(self, x, y, evol):
         person = Personal('ru')
-        self.size = person.age(1, 4)
-        self.name = person.name(gender='female')
+        self.size = random.randint(1, 4)
+        self.name = person.name(gender="female")
         self.x = x
         self.y = y
         self.evol = evol
-        self.type = person.weight()
+        self.type = random.randint(30, 100)
 
     def process_iter(self):
         rand = random.randint(0, 100)
