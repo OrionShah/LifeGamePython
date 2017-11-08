@@ -1,6 +1,5 @@
 from units.Unit import *
 
-import sys
 
 class EmptyUnit(Unit):
     def __init__(self, x, y):

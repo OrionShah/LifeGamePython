@@ -4,68 +4,68 @@ import sys
 
 from prettytable import PrettyTable
 from subprocess import call
-from units.UnitFactory import UnitFactory
+from units.Unit import Unit
+from Table import Table
 
 
-class Main:
-    def __init__(self):
-        self.timer = 0.01
+class TableRender:
+    def __init__(self, table: Table):
+        self.table = table
         self.run = True
-        self.size = 5
-        self.i = 0
-        self.units_list = None
-        self.empty = 0
-        self.start_time = ''
-
-    def render(self):
-
-        self.units_list = [[UnitFactory.create_unit(i, j, 1) for j in range(self.size)] for i in range(self.size)]
+        self.timer = 0.5
         self.start_time = datetime.datetime.fromtimestamp(time.time()).strftime(
             '%d.%m.%Y %H:%M:%S')
         self.i = 1
+
+    def render(self):
         call(["clear"])
-        print("start")
         while self.run:
-            self.process_iter()
+            self.iteration()
 
-    def process_iter(self):
-        self.empty = 0
-        self.i += 1
-
-        current_time = datetime.datetime.fromtimestamp(time.time()).strftime(
-            '%d.%m.%Y %H:%M:%S')
-
-        table = PrettyTable(header=False, hrules=1)
-        for row in self.units_list:
-            table.add_row([unit.get_str() for unit in row])
-            for unit in row:
-                self.process_unit(unit)
-
+    def get_header(self):
+        current_time = datetime.datetime.fromtimestamp(time.time()).strftime('%d.%m.%Y %H:%M:%S')
         main_table = PrettyTable(header=False)
         main_table.add_row([self.timer, "Start time:\n" + self.start_time,
                             "Current time:\n" + current_time,
-                            "Current iter: %d" % self.i,
-                            "Empty: " + str(self.empty)])
+                            "Current iter: %d" % self.i])
+        return main_table
 
-        print(main_table)
-        print(table)
+    def get_main_table(self):
+        t = PrettyTable(header=False, hrules=1)
+        for row in self.table.points:
+            r = []
+            for unit in row:
+                if unit is not None:
+                    r.append(unit.get_str())
+                else:
+                    empty_unit = '             '
+                    for i in range(3):
+                        empty_unit += '\n             '
+                    r.append(empty_unit)
+            t.add_row(r)
+        return t
 
-        if self.empty >= self.size * self.size:
-            sys.exit(0)
+    def process_units(self):
+        for row in self.table.points:
+            for unit in row:
+                if unit is not None:
+                    unit.do()
 
+    def iteration(self):
+        self.process_units()
+        print(self.get_header())
+        print(self.get_main_table())
         print("\033[90A")
         time.sleep(self.timer)
 
-    def process_unit(self, unit):
-        self.units_list[unit.x][unit.y] = unit.process_iter()
-        if unit.is_empty():
-            self.empty += 1
-            status = unit.check_near(self.units_list)
-            if status is True:
-                self.units_list[unit.x][unit.y] = UnitFactory.create_unit(
-                    unit.x, unit.y, 1)
-
 
 if __name__ == "__main__":
-    game = Main()
-    game.render()
+    try:
+        table = Table()
+        renderer = TableRender(table)
+
+        unit = Unit(table, 1, 1)
+
+        renderer.render()
+    except KeyboardInterrupt:
+        pass
